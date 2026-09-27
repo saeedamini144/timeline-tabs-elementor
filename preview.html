@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>پیش‌نمایش تب تایم‌لاین</title>
+<link rel="stylesheet" href="timeline-tabs-elementor/assets/css/timeline-tabs.css">
+<style>
+  body{margin:0;font-family:Tahoma,system-ui,sans-serif;background:#faf9f7;color:#151515}
+  .wrap{padding:24px}
+  .note{max-width:900px;margin:0 auto 24px;font-size:13px;line-height:2;color:#6f6a64}
+  .frame{max-width:100%;margin:0 auto 48px;border:1px dashed #c9c6c0;padding:16px;background:#fff;resize:horizontal;overflow:auto}
+  .frame > b{display:block;font-size:12px;color:#7a7150;margin-bottom:12px}
+  .w-full{width:100%}
+  .w-tab{width:820px}
+  .w-phone{width:390px}
+  .tt__title{font-size:28px}
+  .tt__top{font-size:20px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="note">
+    سه قاب زیر همان خروجی ویجت است در عرض‌های مختلف. لبهٔ راست هر قاب قابل کشیدن است،
+    پس می‌شود شکستن چیدمان را زنده دید (چون بر پایهٔ عرض خودِ ویجت کار می‌کند نه عرض صفحه).
+  </p>
+
+  <div class="frame w-full"><b>عرض کامل — دسکتاپ</b><div id="m1"></div></div>
+  <div class="frame w-tab"><b>۸۲۰ پیکسل — تبلت</b><div id="m2"></div></div>
+  <div class="frame w-phone"><b>۳۹۰ پیکسل — گوشی</b><div id="m3"></div></div>
+</div>
+
+<template id="tpl">
+  <div class="tt" data-reveal="both" data-anim="1" data-scroll="1" data-swipe="1" data-fade="1" data-default="1" role="region" aria-label="تایم‌لاین">
+    <div class="tt__rail">
+      <div class="tt__track" style="--tt-count:6">
+        <span class="tt__line" aria-hidden="true"></span>
+        <span class="tt__fill" aria-hidden="true"></span>
+        <div class="tt__tabs" role="tablist" aria-label="تایم‌لاین"></div>
+      </div>
+    </div>
+    <div class="tt__panels"></div>
+  </div>
+</template>
+
+<script>
+var DATA = [
+  { top:'۱۳۲۷', bottom:'تأسیس کارگاه',      sub:'آغاز راه',   title:'کارگاهی کوچک، ایده‌هایی بزرگ', text:'همه‌چیز از یک کارگاه کوچک شروع شد؛ با همان وسواسی که هنوز هم با ماست.', cols:'3'  },
+  { top:'۱۳۴۱', bottom:'جایگاه در بازار',   sub:'تخصص ویژه', title:'خدمات جامع طراحی',              text:'از نقشهٔ اولیه تا چیدمان نهایی، همهٔ مراحل را زیر یک سقف انجام دادیم.',   cols:'2a' },
+  { top:'۱۳۵۸', bottom:'دورهٔ گذار',        sub:'پایداری',   title:'ماندن در روزهای سخت',           text:'سال‌هایی که کار کم بود اما کیفیت کم نشد.',                              cols:'2b' },
+  { top:'۱۳۷۲', bottom:'صادرات',            sub:'فراتر از مرز', title:'اولین سفارش خارج از کشور',   text:'اولین محموله راهی بازارهای همسایه شد.',                                 cols:'1'  },
+  { top:'۱۳۸۹', bottom:'کارخانهٔ جدید',     sub:'',          title:'',                              text:'',                                                                       cols:'ii' },
+  { top:'۱۴۰۲', bottom:'امروز',             sub:'۷۵ سال تجربه', title:'طراحی برای نسل بعد',         text:'امروز با تیمی بزرگ‌تر، با همان دقت کارگاه اول کار می‌کنیم.',             cols:'3'  }
+];
+
+function img(seed, cls){
+  return '<figure class="tt__media tt__media--' + cls + '">' +
+    '<img src="https://picsum.photos/seed/' + seed + '/600/900" alt="" loading="lazy">' +
+  '</figure>';
+}
+
+function build(host, uid){
+  var frag = document.getElementById('tpl').content.cloneNode(true);
+  var tabs = frag.querySelector('.tt__tabs');
+  var panels = frag.querySelector('.tt__panels');
+
+  DATA.forEach(function (d, i) {
+    var on = i === 1;
+
+    tabs.insertAdjacentHTML('beforeend',
+      '<div class="tt__tab' + (on ? ' is-active' : '') + '" id="' + uid + '-tab-' + i + '" role="tab"' +
+      ' aria-controls="' + uid + '-panel-' + i + '" aria-selected="' + on + '" tabindex="' + (on ? 0 : -1) + '">' +
+        '<span class="tt__top">' + d.top + '</span>' +
+        '<span class="tt__marker"><span class="tt__dot" aria-hidden="true"></span></span>' +
+        '<span class="tt__bottom">' + d.bottom + '</span>' +
+      '</div>');
+
+    var inner = '';
+    if (d.cols === '3' || d.cols === '2a' || d.cols === 'ii') { inner += img(i * 2 + 1, 'a'); }
+    if (d.cols !== 'ii') {
+      inner += '<div class="tt__content">' +
+        (d.sub   ? '<p class="tt__sub">' + d.sub + '</p>' : '') +
+        (d.title ? '<h2 class="tt__title">' + d.title + '</h2>' : '') +
+        (d.text  ? '<div class="tt__text"><p>' + d.text + '</p></div>' : '') +
+      '</div>';
+    }
+    if (d.cols === '3' || d.cols === '2b' || d.cols === 'ii') { inner += img(i * 2 + 2, 'b'); }
+
+    panels.insertAdjacentHTML('beforeend',
+      '<div class="tt__panel' + (on ? ' is-active' : '') + '" id="' + uid + '-panel-' + i + '" role="tabpanel"' +
+      ' aria-labelledby="' + uid + '-tab-' + i + '" aria-hidden="' + !on + '" data-cols="' + d.cols + '">' + inner + '</div>');
+  });
+
+  host.appendChild(frag);
+}
+
+build(document.getElementById('m1'), 'p1');
+build(document.getElementById('m2'), 'p2');
+build(document.getElementById('m3'), 'p3');
+</script>
+<script src="timeline-tabs-elementor/assets/js/timeline-tabs.js"></script>
+</body>
+</html>

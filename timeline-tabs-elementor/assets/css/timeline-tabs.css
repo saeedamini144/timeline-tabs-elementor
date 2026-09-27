@@ -1,0 +1,355 @@
+/* Timeline Tabs for Elementor — frontend styles
+   همهٔ مقادیر قابل تنظیم از پنل المنتور روی متغیرهای CSS نوشته می‌شوند. */
+
+.tt{
+  /* حرکت */
+  --tt-ease:cubic-bezier(.22,.61,.36,1);
+  --tt-dur:700ms;
+  /* خط تایم‌لاین */
+  --tt-line-c:#c9c6c0;
+  --tt-line-h:1px;
+  --tt-fill-c:#7a7150;
+  --tt-fill-h:2px;
+  --tt-line-top:56px;
+  /* تب */
+  --tt-tab-min:112px;
+  --tt-rail-fade:32px;
+  /* نشانگر */
+  --tt-marker-h:40px;
+  --tt-dot-size:18px;
+  --tt-dot-size-a:34px;
+  --tt-dot-c:#b3b0aa;
+  --tt-dot-c-h:#7a7150;
+  --tt-dot-c-a:#7a7150;
+  --tt-ring-c:rgba(122,113,80,.14);
+  --tt-ring-w:0px;
+  --tt-ring-w-h:6px;
+  --tt-ring-w-a:7px;
+  --tt-icon-size:24px;
+  /* پنل */
+  --tt-gap:32px;
+  --tt-side:minmax(0,1fr);
+  --tt-center:minmax(0,1.35fr);
+  --tt-valign:center;
+  --tt-align:center;
+  /* چیدمان باریک: ترتیب بخش متن هنگام تک‌ستونی‌شدن */
+  --tt-stack-order:-1;
+
+  position:relative;
+  display:flex;
+  flex-direction:column;
+}
+.tt *,.tt *::before,.tt *::after{box-sizing:border-box}
+.tt img{max-width:100%}
+
+/* ترتیب تایم‌لاین و محتوا */
+.tt--tl-bottom .tt__rail,
+.tt-pos-bottom .tt__rail{order:2}
+
+/* ======================= ریل و خط ======================= */
+.tt__rail{
+  overflow-x:auto;
+  overflow-y:hidden;
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+  scroll-snap-type:x proximity;
+  scroll-padding-inline:16px;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior-x:contain;
+  /* محوشدگی لبه‌ها؛ هر طرف با کلاس has-prev / has-next روشن می‌شود */
+  --tt-fade-s:0px;
+  --tt-fade-e:0px;
+}
+.tt__rail::-webkit-scrollbar{display:none}
+.tt__rail.has-prev{--tt-fade-s:var(--tt-rail-fade)}
+.tt__rail.has-next{--tt-fade-e:var(--tt-rail-fade)}
+.tt__rail.is-fade{
+  -webkit-mask-image:linear-gradient(to right,transparent 0,#000 var(--tt-fade-s),#000 calc(100% - var(--tt-fade-e)),transparent 100%);
+  mask-image:linear-gradient(to right,transparent 0,#000 var(--tt-fade-s),#000 calc(100% - var(--tt-fade-e)),transparent 100%);
+}
+
+.tt__track{
+  position:relative;
+  min-width:max(100%, calc(var(--tt-count,1) * var(--tt-tab-min)));
+}
+.tt__line,.tt__fill{
+  position:absolute;
+  top:var(--tt-line-top);
+  transform:translateY(-50%);
+  pointer-events:none;
+}
+.tt__line{
+  left:0;right:0;
+  height:var(--tt-line-h);
+  background:var(--tt-line-c);
+}
+.tt__fill{
+  left:0;width:0;
+  height:var(--tt-fill-h);
+  background:var(--tt-fill-c);
+  transition:left var(--tt-dur) var(--tt-ease),width var(--tt-dur) var(--tt-ease);
+}
+.tt__tabs{display:flex}
+
+/* ======================= تب‌ها ======================= */
+.tt__tab{
+  position:relative;
+  flex:1 1 0;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:0 6px 8px;
+  border:0;
+  background:none;
+  color:inherit;
+  font:inherit;
+  text-align:center;
+  cursor:pointer;
+  scroll-snap-align:center;
+  -webkit-tap-highlight-color:transparent;
+}
+.tt__tab:focus{outline:none}
+.tt__tab:focus-visible .tt__marker{outline:2px solid currentColor;outline-offset:4px}
+
+/* عنوان بالایی */
+.tt__top{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:36px;
+  margin:0;
+  color:var(--tt-top-c,#6f6a64);
+  transition:color .3s;
+}
+.tt__tab.is-active .tt__top{color:var(--tt-top-c-a,#151515)}
+
+/* نشانگر (نقطه یا آیکن) */
+.tt__marker{
+  display:grid;
+  place-items:center;
+  width:100%;
+  min-height:var(--tt-marker-h);
+}
+.tt__dot{
+  display:block;
+  width:var(--tt-dot-size);
+  height:var(--tt-dot-size);
+  border-radius:var(--tt-dot-r,50%);
+  background:var(--tt-dot-c);
+  box-shadow:0 0 0 var(--tt-ring-w) var(--tt-ring-c);
+  transition:width .45s var(--tt-ease),height .45s var(--tt-ease),background .3s,box-shadow .3s;
+}
+.tt__tab.is-active .tt__dot{
+  width:var(--tt-dot-size-a);
+  height:var(--tt-dot-size-a);
+  background:var(--tt-dot-c-a);
+  box-shadow:0 0 0 var(--tt-ring-w-a) var(--tt-ring-c);
+}
+.tt__icon{
+  display:grid;
+  place-items:center;
+  width:var(--tt-icon-size);
+  height:var(--tt-icon-size);
+  font-size:var(--tt-icon-size);
+  line-height:1;
+  color:var(--tt-icon-c,#b3b0aa);
+  transition:color .3s,transform .45s var(--tt-ease);
+}
+.tt__icon svg{width:1em;height:1em;display:block;fill:currentColor}
+.tt__icon i,.tt__icon i::before{line-height:1}
+.tt__tab.is-active .tt__icon{color:var(--tt-icon-c-a,#7a7150);transform:scale(var(--tt-icon-scale-a,1))}
+
+/* عنوان پایینی */
+.tt__bottom{
+  margin:14px 0 0;
+  max-width:100%;
+  white-space:nowrap;
+  overflow-wrap:break-word;
+  color:var(--tt-bot-c,#151515);
+  transition:opacity .35s,transform .35s var(--tt-ease),color .3s;
+}
+.tt[data-reveal="always"] .tt__bottom{opacity:1;transform:none}
+.tt[data-reveal="active"] .tt__bottom,
+.tt[data-reveal="hover"] .tt__bottom,
+.tt[data-reveal="both"] .tt__bottom{opacity:0;transform:translateY(-6px)}
+.tt[data-reveal="active"] .tt__tab.is-active .tt__bottom,
+.tt[data-reveal="both"] .tt__tab.is-active .tt__bottom{opacity:1;transform:none;color:var(--tt-bot-c-a,var(--tt-bot-c,#151515))}
+
+/* حالت‌های هاور فقط روی دستگاه دارای اشاره‌گر واقعی؛
+   روی لمسی هاور «می‌چسبد» و تب اشتباهی را برجسته نگه می‌دارد. */
+@media (hover:hover) and (pointer:fine){
+  .tt__tab:hover .tt__top{color:var(--tt-top-c-h,#151515)}
+  .tt__tab:hover .tt__dot{background:var(--tt-dot-c-h);box-shadow:0 0 0 var(--tt-ring-w-h) var(--tt-ring-c)}
+  .tt__tab:hover .tt__icon{color:var(--tt-icon-c-h,#7a7150)}
+  .tt[data-reveal="hover"] .tt__tab:hover .tt__bottom,
+  .tt[data-reveal="both"] .tt__tab:hover .tt__bottom{opacity:var(--tt-bot-op-h,.45);transform:none;color:var(--tt-bot-c-h,var(--tt-bot-c,#151515))}
+}
+
+/* روی لمسی، «فقط هاور» مثل «فقط فعال» رفتار می‌کند تا عنوان پایینی گم نشود. */
+@media (hover:none){
+  .tt[data-reveal="hover"] .tt__tab.is-active .tt__bottom{
+    opacity:1;
+    transform:none;
+    color:var(--tt-bot-c-a,var(--tt-bot-c,#151515));
+  }
+}
+
+/* ======================= پنل‌ها ======================= */
+.tt__panels{
+  position:relative;
+  min-width:0;
+  container-type:inline-size;
+  container-name:ttp;
+}
+.tt__panel{display:none}
+.tt__panel.is-active{
+  display:grid;
+  gap:var(--tt-gap);
+  align-items:var(--tt-valign);
+}
+.tt__panel[data-cols="3"]{grid-template-columns:var(--tt-side) var(--tt-center) var(--tt-side)}
+.tt__panel[data-cols="2a"]{grid-template-columns:var(--tt-side) var(--tt-center)}
+.tt__panel[data-cols="2b"]{grid-template-columns:var(--tt-center) var(--tt-side)}
+.tt__panel[data-cols="ii"]{grid-template-columns:var(--tt-side) var(--tt-side)}
+.tt__panel[data-cols="1"]{grid-template-columns:minmax(0,1fr)}
+
+/* ======================= تصاویر ======================= */
+.tt__media{
+  position:relative;
+  margin:0;
+  overflow:hidden;
+  min-width:0;
+  width:100%;
+  max-width:100%;
+  aspect-ratio:13/20;
+  background:#ece8e2;
+}
+.tt__media img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:cover;
+  object-position:center center;
+  color:transparent; /* پنهان کردن متن جانشین در صورت خطای بارگذاری */
+}
+
+/* ======================= محتوا ======================= */
+.tt__content{min-width:0;text-align:var(--tt-align)}
+.tt__sub{margin:0 0 14px;color:var(--tt-sub-c,#7a7150)}
+.tt__title{margin:0 0 18px;color:var(--tt-title-c,inherit);line-height:1.35}
+.tt__sub,.tt__title,.tt__text{overflow-wrap:anywhere}
+.tt__text{
+  color:var(--tt-text-c,#6f6a64);
+  max-width:var(--tt-text-mw,46ch);
+  margin-inline:var(--tt-text-mi,auto);
+  line-height:2;
+}
+.tt__text > :first-child{margin-top:0}
+.tt__text > :last-child{margin-bottom:0}
+.tt__text p{margin:0 0 var(--tt-text-pgap,1em)}
+.tt__text a{color:var(--tt-link-c,#7a7150);transition:color .25s}
+.tt__text a:hover{color:var(--tt-link-c-h,#645c40)}
+.tt__text img{height:auto}
+.tt__text ul,.tt__text ol{padding-inline-start:1.4em;margin:0 0 var(--tt-text-pgap,1em)}
+.tt__text :where(h1,h2,h3,h4,h5,h6){color:var(--tt-text-h-c,inherit)}
+/* جدول یا کد طولانی نباید کل صفحه را روی موبایل افقی بکشد */
+.tt__text :where(table,pre){display:block;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tt__text :where(iframe,video){max-width:100%}
+
+/* ======================= لوزی تزئینی ======================= */
+.tt__decor{
+  position:absolute;
+  inset-inline-start:var(--tt-decor-x,24px);
+  top:var(--tt-decor-y,58%);
+  width:var(--tt-decor-s,32px);
+  height:var(--tt-decor-s,32px);
+  border:var(--tt-decor-w,1.5px) solid var(--tt-decor-c,#c9c6c0);
+  transform:rotate(45deg);
+  pointer-events:none;
+}
+
+/* ======================= انیمیشن‌ها ======================= */
+@keyframes tt-rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes tt-fade{from{opacity:0}to{opacity:1}}
+@keyframes tt-rev-r{from{clip-path:inset(0 0 0 100%)}to{clip-path:inset(0 0 0 0)}}
+@keyframes tt-rev-l{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes tt-rev-u{from{clip-path:inset(100% 0 0 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes tt-rev-d{from{clip-path:inset(0 0 100% 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes tt-zoom{from{opacity:0;transform:scale(1.08)}to{opacity:1;transform:none}}
+
+.tt__panel.is-anim .tt__media--a img{animation:var(--tt-a-rev,tt-rev-r) var(--tt-dur) var(--tt-ease) both}
+.tt__panel.is-anim .tt__media--b img{animation:var(--tt-b-rev,tt-rev-l) var(--tt-dur) var(--tt-ease) both;animation-delay:var(--tt-b-delay,80ms)}
+.tt__panel.is-anim .tt__content > *{animation:tt-rise var(--tt-dur) var(--tt-ease) both}
+.tt__panel.is-anim .tt__content > :nth-child(2){animation-delay:50ms}
+.tt__panel.is-anim .tt__content > :nth-child(3){animation-delay:100ms}
+.tt__panel.is-anim .tt__content > :nth-child(4){animation-delay:150ms}
+
+/* =====================================================================
+ * واکنش‌گرا — بر پایهٔ عرضِ خودِ ویجت (container query)
+ * تا داخل ستون‌های باریک المنتور هم درست بشکند، نه فقط با عرض صفحه.
+ * ================================================================== */
+
+/* مرحلهٔ ۱ — متن بالا، تصویرها زیر آن */
+@container ttp (max-width:880px){
+  .tt__panel[data-cols="3"]{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .tt__panel[data-cols="3"] .tt__content{grid-column:1 / -1;order:-1}
+  .tt__panel[data-cols="2a"],
+  .tt__panel[data-cols="2b"]{grid-template-columns:minmax(0,1fr)}
+  .tt__panel[data-cols="2a"] .tt__content,
+  .tt__panel[data-cols="2b"] .tt__content{order:var(--tt-stack-order,-1)}
+}
+
+/* مرحلهٔ ۲ — تک‌ستون کامل (گوشی) */
+@container ttp (max-width:560px){
+  .tt__panel[data-cols="3"],
+  .tt__panel[data-cols="ii"]{grid-template-columns:minmax(0,1fr)}
+  .tt__panel[data-cols="3"] .tt__content{grid-column:auto;order:var(--tt-stack-order,-1)}
+}
+
+/* جایگزین برای مرورگرهای بدون پشتیبانی container query (بریک‌پوینت‌های المنتور) */
+@supports not (container-type:inline-size){
+  @media (max-width:1024px){
+    .tt__panel[data-cols="3"]{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+    .tt__panel[data-cols="3"] .tt__content{grid-column:1 / -1;order:-1}
+    .tt__panel[data-cols="2a"],
+    .tt__panel[data-cols="2b"]{grid-template-columns:minmax(0,1fr)}
+    .tt__panel[data-cols="2a"] .tt__content,
+    .tt__panel[data-cols="2b"] .tt__content{order:var(--tt-stack-order,-1)}
+  }
+  @media (max-width:767px){
+    .tt__panel[data-cols="3"],
+    .tt__panel[data-cols="ii"]{grid-template-columns:minmax(0,1fr)}
+    .tt__panel[data-cols="3"] .tt__content{grid-column:auto;order:var(--tt-stack-order,-1)}
+  }
+}
+
+/* «همیشه تک‌ستون» — کلاس روی wrapper المنتور می‌نشیند، پس یک کلاس بیشتر
+   دارد و بدون !important بر قاعده‌های بالا مقدم می‌شود. */
+.tt-stack-on .tt__panel[data-cols="3"],
+.tt-stack-on .tt__panel[data-cols="2a"],
+.tt-stack-on .tt__panel[data-cols="2b"],
+.tt-stack-on .tt__panel[data-cols="ii"]{grid-template-columns:minmax(0,1fr)}
+.tt-stack-on .tt__panel .tt__content{grid-column:auto;order:var(--tt-stack-order,-1)}
+
+/* «هرگز نشکن» — چیدمان اصلی را برمی‌گرداند */
+.tt-stack-off .tt__panel[data-cols="3"]{grid-template-columns:var(--tt-side) var(--tt-center) var(--tt-side)}
+.tt-stack-off .tt__panel[data-cols="2a"]{grid-template-columns:var(--tt-side) var(--tt-center)}
+.tt-stack-off .tt__panel[data-cols="2b"]{grid-template-columns:var(--tt-center) var(--tt-side)}
+.tt-stack-off .tt__panel[data-cols="ii"]{grid-template-columns:var(--tt-side) var(--tt-side)}
+.tt-stack-off .tt__panel .tt__content{grid-column:auto;order:0}
+
+/* لوزی تزئینی در عرض‌های کم جا ندارد */
+@media (max-width:1024px){
+  .tt .tt__decor{display:none}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .tt *,.tt *::before,.tt *::after{
+    animation-duration:.01ms !important;
+    animation-delay:0ms !important;
+    transition-duration:.01ms !important;
+  }
+}
